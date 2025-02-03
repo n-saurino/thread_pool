@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug main",
+            "type": "cppdbg", // switch to lldb if executing on mac with clang
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main", // Replace with your actual executable path
+            "args": [], // Add any arguments your program needs
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "preLaunchTask": "CMake: build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb", // switch to lldb if executing on mac with clang
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "logging": {
+                "engineLogging": true
+            }
+        }
+    ]
+}
+
