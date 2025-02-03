@@ -25,7 +25,7 @@ endif()
 
 find_package(GTest REQUIRED)
 
-add_executable(main src/main.cpp)
+add_executable(main src/main.cpp src/TestThreadPool.cpp)
 
 # Include Boost headers
 target_include_directories(main PRIVATE ${Boost_INCLUDE_DIRS} "${CMAKE_SOURCE_DIR}/include")

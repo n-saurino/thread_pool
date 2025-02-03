@@ -1,16 +1,13 @@
 #include <stdio.h>
+#include <sstream>
 #include <iostream>
-#include <boost/version.hpp>
+#include <gtest/gtest.h>
+#include "ThreadPool.hpp"
 
-int main(int, char**){
+int main(int argc, char** argv){
+    // Initialize Google Test framework
+    ::testing::InitGoogleTest(&argc, argv);
 
-   std::cout << "Boost version: " 
-              << BOOST_VERSION / 100000 << "."  // Major version
-              << BOOST_VERSION / 100 % 1000 << "."  // Minor version
-              << BOOST_VERSION % 100  // Patch level
-              << std::endl;
- 
-
-    int x = 42;
-    printf("Hello, from main! x is %d.\n", x);
+    // Run all tests
+    return RUN_ALL_TESTS();
 }
