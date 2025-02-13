@@ -1,44 +1,116 @@
-Problem Description
+# Implement a Thread Pool
 
-In high-frequency trading (HFT) systems, every microsecond counts. Efficient parallel task execution is critical to achieve low-latency processing. Your task is to implement a thread pool in C++ that can schedule and execute tasks concurrently with minimal overhead. The thread pool must:
-	•	Create a fixed number of worker threads at construction.
-	•	Allow clients to submit tasks that will be executed by the worker threads.
-	•	Ensure that all tasks are completed before the thread pool is destroyed.
-	•	Minimize per-task dynamic memory allocation and synchronization overhead.
+## Problem Description
 
-Your implementation should be robust, thread-safe, and optimized for performance in a high-throughput, low-latency environment.
+In high-frequency trading (HFT) systems, every microsecond counts. Your task is to implement a thread pool in C++ that can schedule and execute tasks concurrently with minimal overhead. The implementation must be optimized for ultra-low latency processing in HFT environments.
 
-Requirements
+## Core Requirements
 
-Implement a thread pool with the following functionality:
-	1.	Constructor
-	•	ThreadPool(size_t numThreads): Initializes the thread pool by creating a specified number of worker threads.
-	2.	Destructor
-	•	Ensures that the thread pool stops accepting new tasks and that all queued tasks are executed before the pool is destroyed.
-	3.	Task Submission
-	•	Implement a function enqueue that accepts a task (a callable object) and its arguments, schedules it for execution, and returns a std::future representing the result of the task.
-	4.	Shutdown (Optional)
-	•	Optionally, implement a shutdown() method that immediately stops the pool from accepting new tasks and safely terminates the worker threads once the current tasks finish.
+### Thread Pool Creation and Management
+- Create a fixed number of worker threads at construction
+- Allow clients to submit tasks for execution by worker threads
+- Ensure all tasks are completed before the thread pool is destroyed
+- Minimize per-task dynamic memory allocation and synchronization overhead
 
-Constraints
-	•	Thread Safety:
-	•	The thread pool must be safe for use by multiple threads concurrently.
-	•	Performance:
-	•	Task submission and execution should run in amortized O(1) time.
-	•	Minimize dynamic memory allocations per task.
-	•	Minimize locking overhead (consider lock-free structures if possible).
-	•	Scalability:
-	•	The pool should be efficient for high-throughput systems like HFT, where tasks are lightweight and frequent.
+## Implementation Requirements
 
-Follow-Up Questions
-	1.	Low Latency Optimizations:
-	•	How would you further optimize the thread pool for ultra-low latency in an HFT environment?
-	•	What techniques would you use to reduce contention (e.g., per-thread task queues, work stealing, or CPU affinity)?
-	2.	Dynamic Resizing:
-	•	How could you extend your thread pool to support dynamic resizing (increasing or decreasing the number of worker threads) without locks?
-	3.	Advanced Scheduling:
-	•	How would you implement task priorities within the thread pool?
-	•	What changes would be necessary if tasks had dependencies?
-	4.	Memory Model Considerations:
-	•	Discuss the use of memory orderings (std::memory_order) in your synchronization primitives.
-	•	How do these choices impact performance in a high-frequency trading system?
+### 1. Constructor
+```cpp
+ThreadPool(size_t numThreads)
+```
+- Initializes the thread pool with specified number of worker threads
+- Sets up necessary data structures for task management
+
+### 2. Destructor
+- Ensures thread pool stops accepting new tasks
+- Guarantees all queued tasks are executed before destruction
+- Properly cleans up all worker threads
+
+### 3. Task Submission
+```cpp
+template<class F, class... Args>
+auto enqueue(F&& f, Args&&... args) -> std::future</*return type of F*/>
+```
+- Accepts a callable object and its arguments
+- Schedules task for execution
+- Returns a `std::future` representing the task's result
+
+### 4. Optional Shutdown Method
+```cpp
+void shutdown()
+```
+- Stops pool from accepting new tasks
+- Safely terminates worker threads after current tasks complete
+
+## Technical Constraints
+
+### Thread Safety
+- Must be safe for concurrent use by multiple threads
+- All operations must maintain consistency and avoid race conditions
+
+### Performance Requirements
+- Task submission and execution: O(1) amortized time complexity
+- Minimize dynamic memory allocations per task
+- Minimize locking overhead (consider lock-free structures)
+
+### Scalability
+- Must efficiently handle high-throughput scenarios
+- Optimized for lightweight, frequent tasks typical in HFT systems
+
+## Follow-Up Considerations
+
+### 1. Low Latency Optimizations
+- Ultra-low latency optimization strategies for HFT environments
+- Contention reduction techniques:
+  - Per-thread task queues
+  - Work stealing algorithms
+  - CPU affinity optimization
+
+### 2. Dynamic Resizing
+- Lock-free approaches to dynamic thread pool resizing
+- Strategies for increasing/decreasing worker threads safely
+
+### 3. Advanced Scheduling
+- Task priority implementation approaches
+- Handling task dependencies
+- Queue management strategies
+
+### 4. Memory Model Considerations
+- Usage of memory orderings (`std::memory_order`)
+- Impact of memory model choices on HFT performance
+- Synchronization primitive optimization
+
+## Example Usage
+
+```cpp
+// Create a thread pool with 4 worker threads
+ThreadPool pool(4);
+
+// Submit a task and get future
+auto future = pool.enqueue([](int x) { 
+    return x * x; 
+}, 42);
+
+// Get result
+int result = future.get(); // Returns 1764
+
+// Optional: Shutdown pool
+pool.shutdown();
+```
+
+## Performance Benchmarking
+
+Key metrics to measure:
+- Task submission latency
+- Task execution latency
+- Thread context switching overhead
+- Memory allocation patterns
+- Cache coherency impact
+
+## Best Practices
+
+1. Use lock-free data structures where possible
+2. Implement CPU cache-friendly memory layouts
+3. Consider NUMA awareness for multi-socket systems
+4. Minimize false sharing through proper padding
+5. Use appropriate memory barriers and fences
